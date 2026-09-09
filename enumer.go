@@ -229,3 +229,30 @@ func (g *Generator) buildYAMLMethods(runs [][]Value, typeName string, runsThresh
 func (g *Generator) buildValidateMethod(typeName string) {
 	g.Printf(validateMethod, typeName)
 }
+
+// Arguments to format are: [1]: type name
+const flagValueMethodSet = `
+// Set allows flag and pflag libraries to set a value dynamically.
+func (i *%[1]s) Set(value string) error {
+	var err error
+	*i, err = %[1]sString(value)
+	return err
+}
+`
+
+// Arguments to format are:	[1]: type name
+const pflagValueMethodType = `
+// Type returns a string that represents all possible values to this type joined by '|'.
+func (%[1]s) Type() string {
+	return strings.Join(_%[1]sNames, "|")
+}
+`
+
+func (g *Generator) buildFlagMethods(runs [][]Value, typeName string, runsThreshold int) {
+	g.Printf(flagValueMethodSet, typeName)
+}
+
+func (g *Generator) buildPflagMethods(runs [][]Value, typeName string, runsThreshold int) {
+	g.Printf(flagValueMethodSet, typeName)
+	g.Printf(pflagValueMethodType, typeName)
+}
